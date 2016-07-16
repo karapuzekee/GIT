@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CREDIT_CALC_V3", "CREDIT_CALC_V3\CREDIT_CALC_V3.csproj", "{13CE82D8-77DD-4894-B0AA-D4E39C2E952B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CREDIT_CALC_V3.Tests", "CREDIT_CALC_V3.Tests\CREDIT_CALC_V3.Tests.csproj", "{8B02FEA5-7274-4B6C-A4BC-983C75286392}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CreditCalculator", "CreditCalculator\CreditCalculator.csproj", "{9588F4BC-0260-4168-9CE1-5173BA9EEC3B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{13CE82D8-77DD-4894-B0AA-D4E39C2E952B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13CE82D8-77DD-4894-B0AA-D4E39C2E952B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13CE82D8-77DD-4894-B0AA-D4E39C2E952B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13CE82D8-77DD-4894-B0AA-D4E39C2E952B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B02FEA5-7274-4B6C-A4BC-983C75286392}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B02FEA5-7274-4B6C-A4BC-983C75286392}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B02FEA5-7274-4B6C-A4BC-983C75286392}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B02FEA5-7274-4B6C-A4BC-983C75286392}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9588F4BC-0260-4168-9CE1-5173BA9EEC3B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9588F4BC-0260-4168-9CE1-5173BA9EEC3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9588F4BC-0260-4168-9CE1-5173BA9EEC3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9588F4BC-0260-4168-9CE1-5173BA9EEC3B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
