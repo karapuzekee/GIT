@@ -3,3 +3,8 @@ C:\Users\sim_p\Desktop\WEB TEST\CREDIT_CALC_V3\CreditCalculator\bin\Debug\Credit
 C:\Users\sim_p\Desktop\WEB TEST\CREDIT_CALC_V3\CreditCalculator\obj\Debug\CreditCalculator.csprojResolveAssemblyReference.cache
 C:\Users\sim_p\Desktop\WEB TEST\CREDIT_CALC_V3\CreditCalculator\obj\Debug\CreditCalculator.dll
 C:\Users\sim_p\Desktop\WEB TEST\CREDIT_CALC_V3\CreditCalculator\obj\Debug\CreditCalculator.pdb
+C:\Users\sim_p\Desktop\WEB TEST\GIT\CREDIT_CALC_V3\CreditCalculator\bin\Debug\CreditCalculator.dll
+C:\Users\sim_p\Desktop\WEB TEST\GIT\CREDIT_CALC_V3\CreditCalculator\bin\Debug\CreditCalculator.pdb
+C:\Users\sim_p\Desktop\WEB TEST\GIT\CREDIT_CALC_V3\CreditCalculator\obj\Debug\CreditCalculator.csprojResolveAssemblyReference.cache
+C:\Users\sim_p\Desktop\WEB TEST\GIT\CREDIT_CALC_V3\CreditCalculator\obj\Debug\CreditCalculator.dll
+C:\Users\sim_p\Desktop\WEB TEST\GIT\CREDIT_CALC_V3\CreditCalculator\obj\Debug\CreditCalculator.pdb

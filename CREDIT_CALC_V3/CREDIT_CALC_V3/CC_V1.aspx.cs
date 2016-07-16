@@ -30,11 +30,16 @@ namespace CREDIT_CALC_V3
             productTypes.Add(new KeyValuePair<int, string>(1, "Investing" + id));
             productTypes.Add(new KeyValuePair<int, string>(2, "Turnover" + id));
 
-            var groups = new List<object>();
+            var groups = new List<Group>();
             var g1 = new Group();
             g1.Settings.Add("ModelTypes", productTypes);
             g1.Parameters.Add(new CcParam {ParamId = 1, ParamValue = "srt1" + id });
             groups.Add(g1);
+
+            var g2 = new Group();
+            g2.Settings.Add("ModelTypes", productTypes);
+            g2.Parameters.Add(new CcParam {ParamId = 2, ParamValue = "srt2" + id });
+            groups.Add(g2);
             var resut = new
             {
                 Groups = groups

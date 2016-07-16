@@ -18,10 +18,10 @@
 </head>
 <body>
 
-                <input  data-bind="value: A" required></input>
+                <input  data-bind="value: A, click: callback"></input>
 
 <ul data-bind="foreach: Groups">
-    <div data-bind='component: {name: "group",params: { data: $data }}'></div>
+    <div data-bind='component: {name: "group",params:  $data }'></div>
 </ul>
     
 <ul data-bind="foreach: Groups1">
@@ -36,7 +36,11 @@
     <li class="product">
         <strong data-bind="text: $index"></strong>
         <strong data-bind="text: AA"></strong>
-                <input type="text" data-bind="value: P" required/>
+                <input type="text" data-bind="value: P"/>
+           
+        <select data-bind="options: Settings.ModelTypes, optionsText: 'Value', optionsValue: 'Key', value: selectedProduct"></select>
+                <strong data-bind="text: selectedProduct"></strong>
+                <strong data-bind="text: $root.A"></strong>
 
         <ul data-bind="foreach: Parameters">
             <li class="product">
@@ -44,7 +48,7 @@
                 <br/>
                 <strong data-bind="text: ParamId"></strong>
                 <br/>
-                <input type="text" data-bind="value: ParamValue" required/><br/>
+                <input type="text" data-bind="value: ParamValue"/><br/>
             </li>
         </ul>
     </li>
@@ -57,13 +61,20 @@
 
     ko.components.register('group', {
         viewModel: function(params) {
-            self = this;
-            this.Parameters = params.data.Parameters;
-            this.AA = "AAAAAAAAAA";
-            this.P = ko.observable().extend({required : true});
+            var self = params;
+          //  self.Parameters = params.data.Parameters;
+       //     self.Settings = params.data.Settings;
+            params.selectedProduct = ko.observable();
+            self.AA = "AAAAAAAAAA";
+            self.P = ko.observable().extend({required : true});
 
-            this.callback = function(num) {
+           
+            self.callback = function (num) {
+                alert(ko.toJSON(self.root));
+
+               
             };
+            return self;
         },
         template: { element: 'group-template' }
     });
@@ -88,7 +99,7 @@
         function ccViewModel() {
             var self = this;
             self.Groups1 = [1,2,3,4,5,6];
-            self.A = ko.observable();
+            self.A = ko.observable(123);
             self.Groups = ko.observableArray([]);
             self.Start = ko.command(function (id) {
                     return getAjax("/CC_V1.aspx/GetSettings", { id: id});
@@ -96,9 +107,52 @@
             ).done(function(data) {
                 ko.mapping.fromJS(data, {}, self);
                 console.log(ko.toJSON(self));
-             //   ko.applyBindings(self);
+                                
+
             });
+
+            self.Start2 = ko.command(function (id) {
+                return getAjax("/CC_V1.aspx/GetCalcValues", { id: id });
+            }
+            ).done(function (data) {
+                ko.mapping.fromJS(data, {}, self);
+                console.log(ko.toJSON(self));
+                //   ko.applyBindings(self);
+
+
+               
+            });
+
+            self.callback = function (num) {
+              //  alert(ko.toJSON(self));
+
+                console.log('self');
+                console.log(self);
+                console.log('ko.toJS(self)');
+                console.log(ko.toJS(self));
+                console.log('ko.toJSON(self)');
+                console.log(ko.toJSON(self));
+                console.log('ko.mapping.toJS(self)');
+                console.log(ko.mapping.toJS(self));
+                console.log('ko.mapping.toJSON(self)');
+                console.log(ko.mapping.toJSON(self));
+
+
+
+
+                var mapping = {
+                    'ignore': ["Groups.AA", "Groups1"]
+                    //'ignore': ["Groups1"]
+                };
+                var mapped = ko.mapping.toJSON(self);
+                var thin = ko.mapping.fromJSON(mapped, mapping);
+
+
+                alert(ko.mapping.toJSON(thin));
+            };
         };
+
+
 
         var vm = new ccViewModel();
         ko.applyBindings(vm);
@@ -108,6 +162,10 @@
 
         }
 
+
+
+       // var a = ko.mapping.fromJS(ko.toJS(vm), {});
+        console.log(ko.toJS(vm));
 
 /*
 
