@@ -33,12 +33,13 @@ namespace CREDIT_CALC_V3
             var groups = new List<Group>();
             var g1 = new Group();
             g1.Settings.Add("ModelTypes", productTypes);
-            g1.Parameters.Add(new CcParam {ParamId = 1, ParamValue = "srt1" + id });
+            g1.Parameters.Add(new CcParam {ParamId = 1, ParamValue = "srt1" + id, ParamName = "P1"});
+            g1.Parameters.Add(new CcParam {ParamId = 2, ParamValue = "srt2" + id, ParamName = "P2"});
             groups.Add(g1);
 
             var g2 = new Group();
             g2.Settings.Add("ModelTypes", productTypes);
-            g2.Parameters.Add(new CcParam {ParamId = 2, ParamValue = "srt2" + id });
+            g2.Parameters.Add(new CcParam {ParamId = 2, ParamValue = "srt2" + id, ParamName = "P1" });
             groups.Add(g2);
             var resut = new
             {
@@ -56,7 +57,7 @@ namespace CREDIT_CALC_V3
             Settings = new Dictionary<string, object>();
             Parameters = new List<CcParam>();
         }
-
+        public int P1 { get; set; }
         public IDictionary<string, object> Settings { get; set; }
         public IList<CcParam> Parameters { get; set; }  
     }
@@ -65,6 +66,7 @@ namespace CREDIT_CALC_V3
     {
         public int ParamId { get; set; }
         public string ParamValue { get; set; }
+        public string ParamName { get; set; }
         public ParamType ParamType { get; set; }
     }
 

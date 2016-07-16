@@ -34,25 +34,43 @@
 </body>
 <script type="text/html" id="group-template">
     <li class="product">
-        <strong data-bind="text: $index"></strong>
-        <strong data-bind="text: AA"></strong>
+        <strong data-bind="text: $index, click: callback"></strong>
+
                 <input type="text" data-bind="value: P"/>
+        <p>------------------</p>
+                <input type="text" data-bind="value: P1"/>
+        <p>------------------</p>
            
         <select data-bind="options: Settings.ModelTypes, optionsText: 'Value', optionsValue: 'Key', value: selectedProduct"></select>
                 <strong data-bind="text: selectedProduct"></strong>
                 <strong data-bind="text: $root.A"></strong>
+                <input type="text" data-bind="value: SupaTest"/><br/>
 
         <ul data-bind="foreach: Parameters">
             <li class="product">
                 <strong data-bind="text: $index"></strong>
                 <br/>
-                <strong data-bind="text: ParamId"></strong>
+                <%--<strong data-bind="text: ParamId"></strong>--%>
+                <strong data-bind="text: $data['ParamId']"></strong>
                 <br/>
                 <input type="text" data-bind="value: ParamValue"/><br/>
+                <input type="text" data-bind="value: $data['ParamId']"/><br/>
+                <input type="text" data-bind="value: $parent.DataSettings['P1'].paramName"/><br/>
             </li>
         </ul>
     </li>
 </script>
+    
+<script type="text/html" id="client-group-template">
+    <div>
+        
+    </div>
+</script>
+
+
+    
+
+
 
 <script type="text/javascript">
 
@@ -65,12 +83,19 @@
           //  self.Parameters = params.data.Parameters;
        //     self.Settings = params.data.Settings;
             params.selectedProduct = ko.observable();
-            self.AA = "AAAAAAAAAA";
-            self.P = ko.observable().extend({required : true});
-
+           
+            self.P1.extend({ required: true });
+            self.P = ko.observable().extend({ required: true });
+            self['SupaTest'] = ko.observable(1111122222233333);
+            self.DataSettings = {
+                "P1": { "paramName": "Param1Name" }
+            }
            
             self.callback = function (num) {
-                alert(ko.toJSON(self.root));
+                console.log(self);
+                alert(self.DataSettings['P1'].paramName);
+
+              //  alert(ko.toJSON(self.root));
 
                
             };
