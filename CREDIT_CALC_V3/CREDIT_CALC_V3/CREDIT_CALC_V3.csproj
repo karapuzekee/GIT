@@ -167,6 +167,7 @@
     <Compile Include="CC_V1.aspx.designer.cs">
       <DependentUpon>CC_V1.aspx</DependentUpon>
     </Compile>
+    <Compile Include="Class1.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
