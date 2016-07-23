@@ -40,11 +40,12 @@
             <input type="text"  data-bind="value: PRM('DateEnd')" />
             <input type="text"  data-bind="value: PRM('RatingId')" />
             <input type="text"  data-bind="value: PRM('Payments')" />
+            <input type="text"  data-bind="value: BoundedData._justShortDate" />
     
     
-     <ul data-bind="foreach: PRM('Payments')()">
+     <ul data-bind="foreach: PRM('Payments')">
          $index()
-        <li>{{PaymentDate}}</li>
+        <li>{{PaymentDate}}{{Redemption}}</li>
         <li><input type="text"  value="{{PaymentDate}}" /></li>
     </ul>
 
@@ -95,92 +96,89 @@
             self.Commentary = {};
         }
 
+        function ObjectToDate(obj, defaultValue) {
+            return !ko.validation.utils.isEmptyVal(obj) ? moment(obj).toDate() : defaultValue || null;
+        }
+
+        function ObjectToFloat(obj, defaultValue) {
+            return !ko.validation.utils.isEmptyVal(obj) ? parseFloat(obj) : defaultValue || null;
+        }
+
+        function ObjectToInt(obj, defaultValue) {
+            return !ko.validation.utils.isEmptyVal(obj) ? parseInt(obj) : defaultValue || null;
+        }
+
         function Payment(data) {
             var self = this;
-            ko.mapping.fromJS(data, {}, this);
+            var date = ObjectToDate(data.PaymentDate);
+            self.PaymentDate = ko.observable(date);
+            var withdrawal = ObjectToFloat(data.Withdrawal);
+            self.Withdrawal = ko.observable(withdrawal);
+            var redemption = ObjectToFloat(data.Redemption);
+            self.Redemption = ko.observable(redemption);
+            var interest = ObjectToFloat(data.Interest);
+            self.Interest = ko.observable(interest);
+            self.Commentary = ko.observable(data.Commentary || "");
 
-            self.PaymentDate = {};
-            self.Withdrawal = {};
-            self.Redemption = {};
-            self.Interest = {};
-            self.Commentary = {};
+            self.SummaryPaid = ko.pureComputed(function() {
+                return self.Redemption() + self.Interest();
+            });
+
+            return self;
         }
 
-        function GetTypedParam(paramName, paramValue) {
-            if (!ko.validation.utils.isEmptyVal(paramValue)) {
-                switch (paramName) {
+
+        var ParameterFactory = new function () {
+            var self = this;
+            self.CreateParameter = function (data) {
+                var name = data.ParamName;
+                var value = data.ParamValue || null;
+                var parameter = ko.mapping.fromJS(data, { copy: ["ParamName"], ignore: ["ParamValue"] });
+
+                    switch (name) {
+                        case "DateStart":
+                        case "DateEnd":
+                            var date = ko.validation.utils.isEmptyVal(value) ? null : moment(value).toDate();
+                            parameter.ParamValue = ko.observable(date);
+                            break;
+                        case "Payments":
+                            var payments = value || [];
+                            var pays = ko.utils.arrayMap(payments, function(item) {
+                                return new Payment(item);
+                            });
+                            parameter.ParamValue = ko.observableArray(pays);
+                            break;
+                        default:
+                            parameter.ParamValue = ko.observable(value);
+                            break;
+                    }
+                    return parameter;
+
+            };
+            self.UpdateParameter = function (data, target) {
+                var name = data.ParamName;
+                var value = data.ParamValue || null;
+
+                switch (name) {
                     case "DateStart":
                     case "DateEnd":
-                        var date = moment(paramValue).toDate();
-                        return date;
+                        var date = ko.validation.utils.isEmptyVal(value) ? null : moment(value).toDate();
+                        target.ParamValue(date);
+                        break;
                     case "Payments":
-                     //   var payments = ko.mapping.fromJS(paramValue, {});
-                      //  console.log(ko.toJS(payments));
-                      //  console.log(ko.toJSON(payments));
-                     //   var payments1 = ko.observableArray(paramValue);
-                     //   return payments1;
+                        var payments = value || [];
+                        var pays = ko.utils.arrayMap(payments, function(item) {
+                            return new Payment(item);
+                        });
+                        target.ParamValue(pays);
+                        break;
                     default:
-                        return paramValue;
+                        target.ParamValue(value);
+                        break;
                 }
-            } else {
-                return null;
-            }
-        };
-
-
-        function TrySetValueType(data) {
-            //if (ko.isObservable(data)) {
-            var value = ko.utils.unwrapObservable(data.ParamValue);
-            var typed = GetTypedParam(data.ParamName, value);
-            data.ParamValue(typed);
-            /*
-                if (!ko.validation.utils.isEmptyVal(value)) {
-                    switch (data.ParamName) {
-                        case "DateStart":
-                        case "DateEnd":
-                            var date = moment(value).toDate();
-                            data.ParamValue(date);
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    data.ParamValue(null);
-                }
-            //}*/
-        }
-
-
-        function TrySetValueType1(data) {
-            //if (ko.isObservable(data)) {
-            var value = ko.utils.unwrapObservable(data.ParamValue);
-            var typed = GetTypedParam(data.ParamName, value);
-            data.ParamValue(typed);
-            /*
-                if (!ko.validation.utils.isEmptyVal(value)) {
-                    switch (data.ParamName) {
-                        case "DateStart":
-                        case "DateEnd":
-                            var date = moment(value).toDate();
-                            data.ParamValue(date);
-                            break;
-                        default:
-                            break;
-                    }
-                } else {
-                    data.ParamValue(null);
-                }
-            //}*/
-        }
-
-
-        function ParameterFactory() {
-            this.CreateParameter = function() {
-
+                return target;
             };
-            this.UpdateParameter = function() {
-
-            };
+            return self;
         }
 
 
@@ -215,23 +213,16 @@
         var mapping = {
             'Parameters': {
                 key: function (options) {
-                    return ko.utils.unwrapObservable(options.ParamName);
+                    var key = ko.utils.unwrapObservable(options.ParamName);
+                    return key;
                 },
                 create: function (options) {
-                    var prmtr = ko.mapping.fromJS(options.data, { copy: ["ParamName"] });
-                    TrySetValueType(prmtr);
-
-
-                    return prmtr; //ko.observable(options.data);
-
+                    var prm = ParameterFactory.CreateParameter(options.data);
+                    return prm; 
                 },
                 update: function (options) {
-                   // var prmtr = ko.mapping.fromJS(options.data, { copy: ["ParamName", "ParamValue"] });
-                    //TrySetValueType(prmtr);
-                    var value = GetTypedParam(options.data.ParamName, options.data.ParamValue);
-                    options.target.ParamValue(value);
-                    //options.target.ParamValue(prmtr.ParamValue());
-                    return options.target; //ko.observable(options.data);
+                    var prm = ParameterFactory.UpdateParameter(options.data, options.target);
+                    return prm;
                 }
             }
         };
@@ -281,7 +272,17 @@
                     var value = parameter === null ? null : parameter.ParamValue;
                     return value;
                 };
-                
+
+
+                self.BoundedData = {};
+                self.BoundedData._justShortDate = ko.pureComputed(function() {
+                    var ds = ko.utils.unwrapObservable(self.PRM('DateStart'));
+                    console.log('_justShortDate-ds--------------------------------');
+                    console.log(ds);
+                    var de = ko.utils.unwrapObservable(self.PRM('DateEnd'));
+                    console.log('_justShortDate-de--------------------------------');
+                    console.log(de);
+                });
 
                 self.Click = function () {
                     Calculate().done(function (data) {
