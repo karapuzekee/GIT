@@ -74,12 +74,16 @@
     <Reference Include="System.EnterpriseServices" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="CC\CalculatorModule.aspx" />
+    <Content Include="CC\partials\creditCalculator.ascx" />
+    <Content Include="CC\scripts\cc_common.js" />
     <Content Include="CC_Scripts\main.js" />
     <Content Include="CC_V1.aspx" />
     <Content Include="packages.config" />
     <Content Include="Scripts\jquery-3.0.0.slim.min.map" />
     <Content Include="Scripts\jquery-3.0.0.min.map" />
     <Content Include="CreditCalculator.aspx" />
+    <Content Include="Scripts\jquery.1.11.3.js" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>
@@ -160,6 +164,20 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CC\CalculatorModule.aspx.cs">
+      <DependentUpon>CalculatorModule.aspx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CC\CalculatorModule.aspx.designer.cs">
+      <DependentUpon>CalculatorModule.aspx</DependentUpon>
+    </Compile>
+    <Compile Include="CC\partials\creditCalculator.ascx.cs">
+      <DependentUpon>creditCalculator.ascx</DependentUpon>
+      <SubType>ASPXCodeBehind</SubType>
+    </Compile>
+    <Compile Include="CC\partials\creditCalculator.ascx.designer.cs">
+      <DependentUpon>creditCalculator.ascx</DependentUpon>
+    </Compile>
     <Compile Include="CC_V1.aspx.cs">
       <DependentUpon>CC_V1.aspx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
@@ -182,6 +200,8 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="CC\serverSide\" />
+    <Folder Include="CC\styles\" />
     <Folder Include="Models\" />
   </ItemGroup>
   <ItemGroup>
