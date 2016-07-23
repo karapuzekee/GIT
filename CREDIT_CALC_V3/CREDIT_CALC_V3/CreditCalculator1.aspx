@@ -258,12 +258,47 @@
         };
     }
 
+    var ccMapping = {
+        "Dictionaries": {
+            create: function(options) {
+                console.log(options);
+            },
+            update: function(options) {
+                for (var k in options.data) {
+                    if (options.target.hasOwnProperty(k)) {
+                        options.target[k] = options.data[k];
+                    }
+                }
+                return options.target;
+            }
+        },
+        "Parameters": {
+            create: function(options) {
+                for (var k in options.data) {
+                    if (self.Context.Parameters.hasOwnProperty(k)) {
+                        ParameterFactory.UpdateParameter(k, options.data, options.target);
+                        //options.target[k] = options.data[k];
+                    }
+                }
+                return options.data;
+            },
+            update: function(options) {
+                for (var k in options.data) {
+                    if (options.target.hasOwnProperty(k)) {
+                        ParameterFactory.UpdateParameter(k, options.data, options.target);
+                        //options.target[k] = options.data[k];
+                    }
+                }
+                return options.target;
+            }
+        },
+        ignore: ["Model", "Bounds"]
+    };
+
 
     function CcComponentModel() {
         var self = this;
-
         self.ComponentsSequence = ko.observableArray([]);
-
         self.Load = ko.command(function() {
             return Load();
         }).done(function(data) {
@@ -272,82 +307,24 @@
                 self.Context = new InvestContext();
                 console.log(self);
 
-                ko.mapping.fromJS(data.d.Context, {
-                    "Dictionaries": {
-                        create: function(options) {
-                            console.log(options);
-                        },
-                        update: function(options) {
-                            for (var k in options.data) {
-                                if (options.target.hasOwnProperty(k)) {
-                                    options.target[k] = options.data[k];
-                                }
-                            }
-                            return options.target;
-                        }
-                    },
-                    "Parameters": {
-                        create: function (options) {
-                            for (var k in options.data) {
-                                if (self.Context.Parameters.hasOwnProperty(k)) {
-                                    ParameterFactory.UpdateParameter(k, options.data, options.target);
-                                    //options.target[k] = options.data[k];
-                                }
-                            }
-                            return options.data;
-                        },
-                        update: function (options) {
-                            for (var k in options.data) {
-                                if (options.target.hasOwnProperty(k)) {
-                                    ParameterFactory.UpdateParameter(k, options.data, options.target);
-                                    //options.target[k] = options.data[k];
-                                }
-                            }
-                            return options.target;
-                        }
-                    },
-                    ignore: ["Model"]
-                }, self.Context);
+                ko.mapping.fromJS(data.d.Context, ccMapping, self.Context);
                 console.log(self);
                 self.ComponentsSequence(InvestComponentsSequence);
-
             }
-
-
         });
 
-        self.Calculate = ko.command(function() {
-            var paramsReq = ko.mapping.toJS(self.Context.Parameters, {
-                "Parameters" : {
-                    create: function(options) {
-                        console.log(options);
-                    },
-                    update: function (options) {
-                        console.log(options);
-                    }
-                }
-            });
-            console.log(paramsReq);
-            return Calculate({ 'paramsReq': paramsReq });
+        self.Calculate = ko.command({
+            action: function() {
+                var paramsReq = ko.mapping.toJS(self.Context.Parameters);
+                console.log(paramsReq);
+                return Calculate({ 'paramsReq': paramsReq });
+            },
+            canExecute: function() {
+                //validation logic
+                return true;
+            }
         }).done(function(data) {
-            ko.mapping.fromJS(data.d.Context, {/*
-                "Parameters": {
-                    create: function (options) {
-                        console.log(options);
-                        alert(options);
-                    },
-                    update: function (options) {
-                        for (var k in options.data) {
-                            if (options.target.hasOwnProperty(k)) {
-                                ParameterFactory.UpdateParameter(k, options.data, options.target);
-                                //options.target[k] = options.data[k];
-                            }
-                        }
-                        return options.target;
-                    }
-                },*/
-                ignore: ["Model", "Dictionaries"]
-            }, self.Context);
+            ko.mapping.fromJS(data.d.Context, { ignore: ["Model", "Dictionaries"] }, self.Context);
         });
 
         self.Sign = ko.command(function() {
@@ -427,10 +404,7 @@
     }
 
     $(document).ready(function() {
-
-
         var vm = new CcComponentModel();
-
 
         ko.punches.enableAll();
         ko.applyBindings(vm);
