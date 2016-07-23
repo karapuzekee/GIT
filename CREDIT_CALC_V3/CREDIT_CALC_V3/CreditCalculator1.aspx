@@ -55,6 +55,10 @@
     
 
 
+    
+
+
+
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>
 <script src="Scripts/jquery-3.0.0.js"></script>
 <script src="Scripts/moment-with-locales.js"></script>
@@ -96,9 +100,29 @@
     <script type="text/html" id="cc-client-conponent">
        1 <input type="text" value="{{Context.Parameters.DateStart}}" />
        1 <input type="text" value="{{Context.Parameters.ProductType}}" />
+       1 <input type="text" value="{{Context.Parameters.CritRevenue}}" />
+       1 <input type="text" value="{{Context.Bounds._productShortStr}}" />
+        
+        
+
+        <select data-bind="options: Context.Dictionaries.YesNo, optionsText: 'Value', optionsValue: 'Key', value: Context.Parameters.CritRevenue">
+            
+        </select>
+
         <select data-bind="options: Context.Dictionaries.ProductTypeList, optionsText: 'Value', optionsValue: 'Key', value: Context.Parameters.ProductType">
             
         </select>
+        
+        
+        <button data-bind="click: Context.Edit">Edit</button>
+<button data-bind="click: Context.Cancel">Cancel</button>
+<button data-bind="click: Context.EndEdit">EndEdit</button>
+<button data-bind="click: Context.Rollback">Rollback</button>
+       FacilitySum<input type="text" data-bind="value: Context.Parameters.FacilitySum"/>
+        
+       <h2>{{Context.dirtyFlag.isDirty}}</h2>
+        Context.Parameters.Payments()[0].Redemption<input type="text" value="{{Context.Parameters.Payments()[0].Redemption}}" />
+        
         
 
     </script>
@@ -154,6 +178,23 @@
         });
     }
 
+    ko.dirtyFlag = function (root, isInitiallyDirty) {
+        var result = function () { },
+            _initialState = ko.observable(ko.toJSON(root)),
+            _isInitiallyDirty = ko.observable(isInitiallyDirty);
+
+        result.isDirty = ko.computed(function () {
+            return _isInitiallyDirty() || _initialState() !== ko.toJSON(root);
+        });
+
+        result.reset = function () {
+            _initialState(ko.toJSON(root));
+            _isInitiallyDirty(false);
+        };
+
+        return result;
+    };
+
     function ObjectToDate(obj, defaultValue) {
         //alert(Date(obj));
         return !ko.validation.utils.isEmptyVal(obj) ? moment(obj).toDate() : defaultValue || null;
@@ -173,8 +214,8 @@
         self.PaymentDate = ko.observable(date);
         var withdrawal = ObjectToFloat(data.Withdrawal);
         self.Withdrawal = ko.observable(withdrawal);
-        var redemption = ObjectToFloat(data.Redemption);
-        self.Redemption = ko.observable(redemption);
+        var redemption = ObjectToFloat(data.Redemption, 0);
+        self.Redemption = ko.editable(redemption);
         var interest = ObjectToFloat(data.Interest);
         self.Interest = ko.observable(interest);
         self.Commentary = ko.observable(data.Commentary || "");
@@ -188,29 +229,6 @@
 
     var ParameterFactory = new function () {
         var self = this;
-        self.CreateParameter = function (name, target) {
-            var value = target[name] || null;
-
-            switch (name) {
-                case "DateStart":
-                case "DateEnd":
-                    var date = ko.validation.utils.isEmptyVal(value) ? null : Date(value); //moment(value).toDate();
-                    target[name](date);
-                    break;
-                case "Payments":
-                    var payments = value || [];
-                    var pays = ko.utils.arrayMap(payments, function (item) {
-                        return new Payment(item);
-                    });
-                    target[name](pays);
-                    break;
-                default:
-                    target[name](value);
-                    break;
-            }
-            //return parameter;
-
-        };
         self.UpdateParameter = function (name, src, target) {
             var value = src[name] || null;
 
@@ -231,38 +249,11 @@
                     target[name](value);
                     break;
             }
-            //return target;
-        };
-
-        self.ConvertForRequest = function (name, src, target) {
-            var value = src[name] || null;
-
-            switch (name) {
-                case "DateStart":
-                case "DateEnd":
-                    var date = ko.validation.utils.isEmptyVal(value) ? null : Date(value); //moment(value).toDate();
-                    target[name](date);
-                    break;
-                case "Payments":
-                    var payments = value || [];
-                    var pays = ko.utils.arrayMap(payments, function (item) {
-                        return new Payment(item);
-                    });
-                    target[name](pays);
-                    break;
-                default:
-                    target[name](value);
-                    break;
-            }
-            //return target;
         };
     }
 
     var ccMapping = {
         "Dictionaries": {
-            create: function(options) {
-                console.log(options);
-            },
             update: function(options) {
                 for (var k in options.data) {
                     if (options.target.hasOwnProperty(k)) {
@@ -299,7 +290,7 @@
     function CcComponentModel() {
         var self = this;
         self.ComponentsSequence = ko.observableArray([]);
-        self.Load = ko.command(function() {
+        self.Load = ko.command(function () {
             return Load();
         }).done(function(data) {
 
@@ -310,13 +301,14 @@
                 ko.mapping.fromJS(data.d.Context, ccMapping, self.Context);
                 console.log(self);
                 self.ComponentsSequence(InvestComponentsSequence);
+
+                self.Context.dirtyFlag.reset();
             }
         });
 
         self.Calculate = ko.command({
-            action: function() {
+            action: function () {
                 var paramsReq = ko.mapping.toJS(self.Context.Parameters);
-                console.log(paramsReq);
                 return Calculate({ 'paramsReq': paramsReq });
             },
             canExecute: function() {
@@ -325,13 +317,30 @@
             }
         }).done(function(data) {
             ko.mapping.fromJS(data.d.Context, { ignore: ["Model", "Dictionaries"] }, self.Context);
+            self.Context.dirtyFlag.reset();
         });
 
         self.Sign = ko.command(function() {
 
         }).done(function(options) {
 
+
         });
+        ko.editable.makeEditable(self);
+
+        self.Test = ko.editable();
+        self.Edit = function () {
+            self.beginEdit();
+        };
+        self.Cancel = function () {
+            self.cancelEdit();
+        };
+        self.EndEdit = function () {
+            self.endEdit();
+        };
+        self.Rollback = function () {
+            self.rollback();
+        };
 
         self.Load();
         return self;
@@ -340,17 +349,42 @@
     var InvestComponentsSequence = ["cc-client-conponent", "cc-product-component", "cc-guarantees-component", "cc-payments-component", "cc-rates-component"];
     var TurnoverComponentsSequence = ["cc-client-conponent", "cc-turnover-component"];
 
+    var forEachEditableProperty = function (target, action) {
+        for (var prop in target) {
+            if (target.hasOwnProperty(prop)) {
+                var value = target[prop];
+
+                if (value.isDirty())
+
+
+                var unwrappedValue = ko.unwrap(value);
+
+                //editables in arrays
+                if (unwrappedValue && unwrappedValue.length) {
+                    for (var i = 0; i < unwrappedValue.length; i++) {
+                        if (unwrappedValue[i] && unwrappedValue[i].isEditing) {
+                            action(unwrappedValue[i]);
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+
     function InvestContext() {
         var self = this;
+
         self.Parameters = {};
+
         self.Parameters.Rating = ko.observable();
         self.Parameters.Ccs = ko.observable();
         self.Parameters.CritLimit = ko.observable();
-        self.Parameters.CritRevenue = ko.observable();
-        self.Parameters.FacilitySum = ko.observable();
+        self.Parameters.CritRevenue = ko.editable();
+        self.Parameters.FacilitySum = ko.editable();
         self.Parameters.FacilityDuration = ko.observable();
         self.Parameters.ProductSum = ko.observable();
-        self.Parameters.ProductType = ko.observable();
+        self.Parameters.ProductType = ko.editable();
         self.Parameters.CommFix = ko.observable();
         self.Parameters.CommVar = ko.observable();
         self.Parameters.Option = ko.observable();
@@ -363,9 +397,9 @@
         self.Parameters.RedemPercentDelayType = ko.observable();
         self.Parameters.RedemDelay = ko.observable();
         self.Parameters.RedemPercentDelay = ko.observable();
-        self.Parameters.DateStart = ko.observable();
+        self.Parameters.DateStart = ko.editable();
         self.Parameters.DateEnd = ko.observable();
-        self.Parameters.Payments = ko.observableArray([]);
+        self.Parameters.Payments = ko.editableArray([]);
         self.Parameters.Rates = ko.observableArray([]);
 
         self.Dictionaries = {};
@@ -379,6 +413,7 @@
         self.Dictionaries.RedemPercentDelayTypeList = [];
         self.Dictionaries.RedemDelayList = [];
         self.Dictionaries.RedemPercentDelayList = [];
+        self.Dictionaries.YesNo = [{ Key: 0, Value: "Нет" }, { Key: 1, Value: "Да" }];
 
         self.Bounds = {};
         self.Bounds._currencyShortStr = ko.pureComputed(function() {
@@ -387,7 +422,7 @@
             var entry = ko.utils.arrayFirst(self.Dictionaries.CurrencyList, function(item) {
                 return item.Key === currencyValue;
             }) || null;
-            return entry === null ? "неизвестно" : entry.ShortStr;
+            return entry === null ? "неизвестно" : entry.Value;
 
         });
         self.Bounds._productShortStr = ko.pureComputed(function() {
@@ -396,9 +431,26 @@
             var entry = ko.utils.arrayFirst(self.Dictionaries.ProductTypeList, function(item) {
                 return item.Key === productValue;
             }) || null;
-            return entry === null ? "неизвестно" : entry.ShortStr;
+            return entry === null ? "неизвестно" : entry.Value;
         });
 
+
+        ko.editable.makeEditable(self.Parameters);
+
+        self.Edit = function () {
+            self.Parameters.beginEdit();
+        };
+        self.Cancel = function () {
+            self.Parameters.cancelEdit();
+        };
+        self.EndEdit = function () {
+            self.Parameters.endEdit();
+        };
+        self.Rollback = function () {
+            self.Parameters.rollback();
+        };
+        
+        self.dirtyFlag = new ko.dirtyFlag(self, true);
 
         return self;
     }
