@@ -85,7 +85,7 @@
     <Content Include="Scripts\jquery-3.0.0.min.map" />
     <Content Include="CreditCalculator.aspx" />
     <Content Include="Scripts\jquery.1.11.3.js" />
-    <Content Include="_towork\cc_common.js" />
+    <Content Include="_towork\cc_main.js" />
     <Content Include="_towork\cc_mappings.js" />
     <Content Include="_towork\cc_settings.js" />
     <Content Include="_towork\cc_view_models.js" />
