@@ -137,6 +137,15 @@ namespace CREDIT_CALC_V3
 
     public class CcPayment
     {
+        public CcPayment()
+        {
+            PaymentDate = DateTime.MinValue;
+            Commentary = "";
+            Interest = 0;
+            Redemption = 0;
+            Withdrawal = 0;
+        }
+
         public DateTime PaymentDate  { get; set; }
         public decimal Withdrawal { get; set; }
         public decimal Redemption{ get; set; }

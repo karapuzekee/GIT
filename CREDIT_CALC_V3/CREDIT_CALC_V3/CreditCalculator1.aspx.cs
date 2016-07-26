@@ -118,17 +118,39 @@ namespace CREDIT_CALC_V3
             productDictionary.Add(new KeyValuePair<int, dynamic>(6, "Транши" ));
             dictionaries.Add("ProductTypeList", productDictionary);
 
+
+            var r = new CalculationClient();
+            r.Parameters.Add(new Parameter {Value = 100, Name = "A", Type = ParameterType.Rating});
+            r.Parameters.Add(new Parameter {Value = true, Name = "B", Type = ParameterType.Ccs});
+            r.Payments.Add(new CcPayment {Interest = 100, PaymentDate = DateTime.Now});
+            r.Payments.Add(new CcPayment {Interest = 200, PaymentDate = DateTime.Now});
+            r.Payments.Add(new CcPayment {Interest = 300, PaymentDate = DateTime.Now});
+            r.Dictionary["Rating"] = 12;
+            r.Dictionary["Ccs"] = true;
+            r.Dictionary["CriLimit"] = true;
+            //r.S = 222;
             return new ResultData
             {
                 Context = new
                 {
                     Dictionaries = dictionaries,
                     Parameters = dict,
-                    Model = 1
+                    Model = 1,
+                    SomeClass = r
                 },
                 Error = false,
                 ErrorMessage = null
             };
+        }
+
+        [System.Web.Services.WebMethod]
+        [ScriptMethod(ResponseFormat = ResponseFormat.Json)]
+        public static object TestZ(CalculationClient s)
+        {
+
+            var sss = s;
+
+            return true;
         }
 
         [System.Web.Services.WebMethod]
@@ -196,6 +218,54 @@ namespace CREDIT_CALC_V3
             };
         }
 
+
+
+    }
+
+    public class SomeClass
+    {
+        public SomeClass()
+        {
+            G = "";
+            S = 5;
+            Z = DateTime.Now;
+            SomeClass2s = new List<SomeClass2>();
+        }
+        public string G { get; set; }
+        public int S { get; set; }
+        public DateTime Z { get; set; }
+
+        public int B { get { return S + 1; } }
+
+        public IList<SomeClass2> SomeClass2s { get; set; }
+    }
+
+    public class SomeClass2
+    {
+        public SomeClass2()
+        {
+            G = "";
+            S = 5;
+            Z = DateTime.Now;
+        }
+        public string G { get; set; }
+        public int S { get; set; }
+        public DateTime Z { get; set; }
+    }
+
+    public class CalculationClient
+    {
+        public CalculationClient()
+        {
+            Parameters = new List<Parameter>();
+            Payments = new List<CcPayment>();
+            Dictionary= new Dictionary<string, object>();
+        }
+        public int S { get; private set; }
+
+        public IList<Parameter> Parameters { get; set; }
+        public IList<CcPayment> Payments { get; set; }
+        public IDictionary<string,object> Dictionary { get; set; }
 
 
     }

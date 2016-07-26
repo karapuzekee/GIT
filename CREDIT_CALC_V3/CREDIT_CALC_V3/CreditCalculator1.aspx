@@ -79,7 +79,8 @@
             data: '{ }',
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            success: function(msg) {
+            success: function (msg) {
+
             }
         });
     }
@@ -91,17 +92,70 @@
             data: JSON.stringify(data),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json',
-            success: function(msg) {
+            success: function(data) {
+
+            }
+        });
+    }
+
+    function TestZ(data) {
+        return $.ajax({
+            type: 'POST',
+            url: '<%= ResolveUrl(@"~/CreditCalculator1.aspx/TestZ") %>',
+            data: JSON.stringify(data),
+            contentType: 'application/json; charset=utf-8',
+            dataType: 'json',
+            success: function(data) {
 
             }
         });
     }
 
     $(document).ready(function() {
-        var vm = new CcComponentModel();
+       // var vm = new CcComponentModel();
+        Load().done(function (data) {
+            var zz = ko.mapping.fromJS(data.d.Context, {
+                "SomeClass": {
+                    create: function (options) {
+                        options.data.Payments = ko.editableArray(options.data.Payments);
+                        ko.mapping.fromJS(options.data, {
+                            "Payments": {
+                                create: function(options) {
+                                    options.data.PaymentDate = ko.editable(new Date());
+                                    return options.data;
+                                }
+                            }
+                        });
+                        return options.data;
+                    }
+                }
+            });
 
-        ko.punches.enableAll();
-        ko.applyBindings(vm);
+            zz.SomeClass.Payments.beginEdit();
+            ko.editable.makeEditable(zz.SomeClass);
+            zz.SomeClass.beginEdit();
+            zz.SomeClass.S = 999;
+            zz.SomeClass.S1 = 999;
+            zz.SomeClass.S3 = 999;
+            zz.SomeClass.S4 = { ID: 1, VALUE: 3 };
+
+            var o = ko.mapping.fromJS(data.d.Context.SomeClass, {
+                "Payments" : {
+                    create : function(options) {
+                        options.data.PaymentDate = ko.editable(new Date());
+                        return options.data;
+                    }
+                }
+            });
+            
+
+            var s = ko.mapping.toJS(zz.SomeClass);
+            console.log(s);
+
+            TestZ({ 's': s });
+        });
+        // ko.punches.enableAll();
+        // ko.applyBindings(vm);
     });
 
 

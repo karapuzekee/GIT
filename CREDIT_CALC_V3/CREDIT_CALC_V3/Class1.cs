@@ -19,6 +19,13 @@ namespace CREDIT_CALC_V3
 
     public class Parameter
     {
+        public Parameter()
+        {
+            Type = ParameterType.Ccs;
+            Name = "";
+            Value = "";
+        }
+
         public ParameterType Type { get; set; }
         public string Name { get; set; }
         public object Value { get; set; }
@@ -104,7 +111,13 @@ namespace CREDIT_CALC_V3
 
     public class Calculation
     {
+        public Calculation()
+        {
+            Parameters = new List<Parameter>();
+            Payments = new List<CcPayment>();
+        }
         public IList<Parameter> Parameters { get; set; }
+        public IList<CcPayment> Payments { get; set; }
     }
 
 
